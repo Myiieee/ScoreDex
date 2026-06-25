@@ -77,191 +77,207 @@
 
     <script>
         // DOM Elements
-        const setupPage = document.getElementById('setup-page');
-        const boardPage = document.getElementById('board-page');
-        const resultsPage = document.getElementById('results-page');
-        
-        const startBtn = document.getElementById('start-btn');
-        const exitBtn = document.getElementById('exit-btn');
-        const nextActionBtn = document.getElementById('next-action-btn');
-        const homeBtn = document.getElementById('home-btn');
-        
-        const teamCountInput = document.getElementById('team-count');
-        const bonusValueInput = document.getElementById('bonus-value');
-        const infiniteRoundsInput = document.getElementById('infinite-rounds');
-        const roundCountInput = document.getElementById('round-count');
-        const allowNegativeInput = document.getElementById('allow-negative');
-        const roundLimitGroup = document.getElementById('round-limit-group');
-        
-        const roundTitle = document.getElementById('round-title');
-        const teamsGrid = document.getElementById('teams-grid');
-        const gameWinner = document.getElementById('game-winner');
-        const resultsContent = document.getElementById('results-content');
+const setupPage = document.getElementById('setup-page');
+const boardPage = document.getElementById('board-page');
+const resultsPage = document.getElementById('results-page');
 
-        let gameState = {
-            teams: [],
-            bonusValue: 5,
-            allowNegative: false,
-            isInfinite: false,
-            totalRounds: 5,
-            currentRound: 1,
-            history: [] // Tracks score snapshots at the end of every round
-        };
+const startBtn = document.getElementById('start-btn');
+const exitBtn = document.getElementById('exit-btn');
+const nextActionBtn = document.getElementById('next-action-btn');
+const homeBtn = document.getElementById('home-btn');
 
-        // Toggle visibility of round entry field based on infinite checkbox
-        infiniteRoundsInput.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                roundLimitGroup.classList.add('hidden');
-            } else {
-                roundLimitGroup.classList.remove('hidden');
-            }
+const teamCountInput = document.getElementById('team-count');
+const bonusValueInput = document.getElementById('bonus-value');
+const infiniteRoundsInput = document.getElementById('infinite-rounds');
+const roundCountInput = document.getElementById('round-count');
+const allowNegativeInput = document.getElementById('allow-negative');
+const roundLimitGroup = document.getElementById('round-limit-group');
+
+const roundTitle = document.getElementById('round-title');
+const teamsGrid = document.getElementById('teams-grid');
+const gameWinner = document.getElementById('game-winner');
+const resultsContent = document.getElementById('results-content');
+
+let gameState = {
+    teams: [],
+    bonusValue: 5,
+    allowNegative: false,
+    isInfinite: false,
+    totalRounds: 5,
+    currentRound: 1,
+    history: [],      // Stores only the points scored matching that specific round
+    runningTotals: [] // Keeps track of the overall scores displayed on screen
+};
+
+// Toggle visibility of round entry field based on infinite checkbox
+infiniteRoundsInput.addEventListener('change', (e) => {
+    if (e.target.checked) {
+        roundLimitGroup.classList.add('hidden');
+    } else {
+        roundLimitGroup.classList.remove('hidden');
+    }
+});
+
+// Event Listeners
+startBtn.addEventListener('click', startGame);
+exitBtn.addEventListener('click', exitGame);
+nextActionBtn.addEventListener('click', handleRoundAdvancement);
+homeBtn.addEventListener('click', goHome);
+
+function startGame() {
+    const teamCount = parseInt(teamCountInput.value) || 2;
+    gameState.bonusValue = parseInt(bonusValueInput.value) || 5;
+    gameState.allowNegative = allowNegativeInput.checked;
+    gameState.isInfinite = infiniteRoundsInput.checked;
+    gameState.totalRounds = gameState.isInfinite ? 0 : (parseInt(roundCountInput.value) || 5);
+    gameState.currentRound = 1;
+    gameState.teams = [];
+    gameState.runningTotals = [];
+    gameState.history = [];
+
+    for (let i = 1; i <= teamCount; i++) {
+        gameState.teams.push({ id: i, name: `Team ${i}` });
+        gameState.runningTotals.push(0); // Everyone starts at 0 points
+    }
+
+    updateRoundHeader();
+    renderScoreboard();
+    
+    setupPage.classList.add('hidden');
+    boardPage.classList.remove('hidden');
+}
+
+function updateRoundHeader() {
+    if (gameState.isInfinite) {
+        roundTitle.textContent = `Round ${gameState.currentRound}`;
+        nextActionBtn.textContent = "End Round & Proceed";
+    } else {
+        roundTitle.textContent = `Round ${gameState.currentRound} / ${gameState.totalRounds}`;
+        if (gameState.currentRound === gameState.totalRounds) {
+            nextActionBtn.textContent = "End Game & View Results";
+            nextActionBtn.style.backgroundColor = "#d9480f"; 
+        } else {
+            nextActionBtn.textContent = "End Round & Proceed";
+            nextActionBtn.style.backgroundColor = "#1098ad";
+        }
+    }
+}
+
+function updateScore(teamIndex, amount) {
+    const currentDisplayScore = gameState.runningTotals[teamIndex];
+    const newScore = currentDisplayScore + amount;
+
+    if (!gameState.allowNegative && newScore < 0) return; 
+
+    gameState.runningTotals[teamIndex] = newScore;
+    document.getElementById(`score-${teamIndex}`).textContent = newScore;
+}
+
+function handleRoundAdvancement() {
+    // 1. Figure out exactly how many points were earned in THIS specific round
+    const roundScoresSnapshot = gameState.runningTotals.map((currentTotal, index) => {
+        // Calculate historical points already accounted for in previous rounds
+        const totalPointsBeforeThisRound = gameState.history.reduce((sum, pastRound) => sum + pastRound.scores[index], 0);
+        // Current Total minus Past Rounds Total = Points gained specifically in this round
+        return currentTotal - totalPointsBeforeThisRound;
+    });
+
+    // 2. Save just the round's isolated score metrics to history
+    gameState.history.push({
+        round: gameState.currentRound,
+        scores: roundScoresSnapshot
+    });
+
+    if (!gameState.isInfinite && gameState.currentRound >= gameState.totalRounds) {
+        endGame();
+    } else {
+        gameState.currentRound++;
+        updateRoundHeader();
+    }
+}
+
+function endGame() {
+    boardPage.classList.add('hidden');
+    resultsPage.classList.remove('hidden');
+
+    // Find the absolute winner using the final accumulated running totals
+    let maxScore = -Infinity;
+    let winners = [];
+    gameState.teams.forEach((t, index) => {
+        const finalScore = gameState.runningTotals[index];
+        if (finalScore > maxScore) { 
+            maxScore = finalScore; 
+            winners = [t.name]; 
+        } else if (finalScore === maxScore) { 
+            winners.push(t.name); 
+        }
+    });
+
+    gameWinner.textContent = winners.length > 1 ? `Tie Match: ${winners.join(' & ')}!` : `👑 Winner: ${winners[0]}!`;
+
+    resultsContent.innerHTML = '';
+
+    if (gameState.isInfinite || gameState.history.length === 0) {
+        let tableHtml = `<table class="results-table"><thead><tr><th>Team</th><th>Final Score</th></tr></thead><tbody>`;
+        gameState.teams.forEach((t, index) => {
+            tableHtml += `<tr><td><strong>${t.name}</strong></td><td>${gameState.runningTotals[index]} pts</td></tr>`;
+        });
+        tableHtml += `</tbody></table>`;
+        resultsContent.innerHTML = tableHtml;
+    } else {
+        // Round-by-Round isolated score matrix table
+        let tableHtml = `<table class="results-table"><thead><tr><th>Round No.</th>`;
+        gameState.teams.forEach(t => { tableHtml += `<th>${t.name}</th>`; });
+        tableHtml += `</tr></thead><tbody>`;
+
+        // Rows showing ONLY what was received per separate round
+        gameState.history.forEach(h => {
+            tableHtml += `<tr><td><strong>Round ${h.round}</strong></td>`;
+            h.scores.forEach(score => { tableHtml += `<td>${score >= 0 ? '+' + score : score}</td>`; });
+            tableHtml += `</tr>`;
         });
 
-        // Event Listeners
-        startBtn.addEventListener('click', startGame);
-        exitBtn.addEventListener('click', exitGame);
-        nextActionBtn.addEventListener('click', handleRoundAdvancement);
-        homeBtn.addEventListener('click', goHome);
+        // Final Total Row adding everything up at the very bottom
+        tableHtml += `<tr class="total-row"><td><strong>Total</strong></td>`;
+        gameState.runningTotals.forEach(total => { tableHtml += `<td><strong>${total}</strong></td>`; });
+        tableHtml += `</tr></tbody></table>`;
 
-        function startGame() {
-            const teamCount = parseInt(teamCountInput.value) || 2;
-            gameState.bonusValue = parseInt(bonusValueInput.value) || 5;
-            gameState.allowNegative = allowNegativeInput.checked;
-            gameState.isInfinite = infiniteRoundsInput.checked;
-            gameState.totalRounds = gameState.isInfinite ? 0 : (parseInt(roundCountInput.value) || 5);
-            gameState.currentRound = 1;
-            gameState.teams = [];
-            gameState.history = [];
+        resultsContent.innerHTML = tableHtml;
+    }
+}
 
-            for (let i = 1; i <= teamCount; i++) {
-                gameState.teams.push({ id: i, name: `Team ${i}`, score: 0 });
-            }
+function exitGame() {
+    if (confirm("Quit current game match? Action drops progress metrics permanently.")) {
+        // If they exit early, log the current ongoing round metrics before displaying the page
+        handleRoundAdvancement();
+        endGame();
+    }
+}
 
-            updateRoundHeader();
-            renderScoreboard();
-            
-            setupPage.classList.add('hidden');
-            boardPage.classList.remove('hidden');
-        }
+function goHome() {
+    resultsPage.classList.add('hidden');
+    setupPage.classList.remove('hidden');
+}
 
-        function updateRoundHeader() {
-            if (gameState.isInfinite) {
-                roundTitle.textContent = `Round ${gameState.currentRound}`;
-                nextActionBtn.textContent = "End Round & Proceed";
-            } else {
-                roundTitle.textContent = `Round ${gameState.currentRound} / ${gameState.totalRounds}`;
-                if (gameState.currentRound === gameState.totalRounds) {
-                    nextActionBtn.textContent = "End Game & View Results";
-                    nextActionBtn.style.backgroundColor = "#d9480f"; // Highlight final step
-                } else {
-                    nextActionBtn.textContent = "End Round & Proceed";
-                    nextActionBtn.style.backgroundColor = "#1098ad";
-                }
-            }
-        }
-
-        function updateScore(teamIndex, amount) {
-            const team = gameState.teams[teamIndex];
-            const newScore = team.score + amount;
-
-            if (!gameState.allowNegative && newScore < 0) return; 
-
-            team.score = newScore;
-            document.getElementById(`score-${teamIndex}`).textContent = team.score;
-        }
-
-        function handleRoundAdvancement() {
-            // Take snapshot copy of current scores for history logs
-            gameState.history.push({
-                round: gameState.currentRound,
-                scores: gameState.teams.map(t => ({ name: t.name, score: t.score }))
-            });
-
-            if (!gameState.isInfinite && gameState.currentRound >= gameState.totalRounds) {
-                endGame();
-            } else {
-                gameState.currentRound++;
-                updateRoundHeader();
-                // Optional: reset scores back to 0 per round? 
-                // Right now it keeps cumulative totals running.
-            }
-        }
-
-        function endGame() {
-            boardPage.classList.add('hidden');
-            resultsPage.classList.remove('hidden');
-
-            // Find absolute winner based on final scores
-            let maxScore = -Infinity;
-            let winners = [];
-            gameState.teams.forEach(t => {
-                if (t.score > maxScore) { maxScore = t.score; winners = [t.name]; }
-                else if (t.score === maxScore) { winners.push(t.name); }
-            });
-
-            gameWinner.textContent = winners.length > 1 ? `Tie Match: ${winners.join(' & ')}!` : `👑 Winner: ${winners[0]}!`;
-
-            // Render calculations table layout
-            resultsContent.innerHTML = '';
-
-            if (gameState.isInfinite || gameState.history.length === 0) {
-                // Simplistic view when no static round limits are defined
-                let tableHtml = `<table class="results-table"><thead><tr><th>Team</th><th>Final Score</th></tr></thead><tbody>`;
-                gameState.teams.forEach(t => {
-                    tableHtml += `<tr><td><strong>${t.name}</strong></td><td>${t.score} pts</td></tr>`;
-                });
-                tableHtml += `</tbody></table>`;
-                resultsContent.innerHTML = tableHtml;
-            } else {
-                // Full Round-by-Round Breakdown Matrix
-                let tableHtml = `<table class="results-table"><thead><tr><th>Round No.</th>`;
-                gameState.teams.forEach(t => { tableHtml += `<th>${t.name}</th>`; });
-                tableHtml += `</tr></thead><tbody>`;
-
-                gameState.history.forEach(h => {
-                    tableHtml += `<tr><td><strong>Round ${h.round}</strong></td>`;
-                    h.scores.forEach(s => { tableHtml += `<td>${s.score}</td>`; });
-                    tableHtml += `</tr>`;
-                });
-
-                tableHtml += `<tr class="total-row"><td><strong>Total</strong></td>`;
-                gameState.teams.forEach(t => { tableHtml += `<td><strong>${t.score}</strong></td>`; });
-                tableHtml += `</tr></tbody></table>`;
-
-                resultsContent.innerHTML = tableHtml;
-            }
-        }
-
-        function exitGame() {
-            if (confirm("Quit current game match? Action drops progress metrics permanently.")) {
-                endGame();
-            }
-        }
-
-        function goHome() {
-            resultsPage.classList.add('hidden');
-            setupPage.classList.remove('hidden');
-        }
-
-        function renderScoreboard() {
-            teamsGrid.innerHTML = '';
-            gameState.teams.forEach((team, index) => {
-                const teamCard = document.createElement('div');
-                teamCard.className = 'team-card';
-                teamCard.innerHTML = `
-                    <h3>${team.name}</h3>
-                    <div class="score-display" id="score-${index}">${team.score}</div>
-                    <div class="control-buttons">
-                        <button class="btn btn-success btn-main" onclick="updateScore(${index}, 1)">+1</button>
-                        <div class="secondary-buttons">
-                            <button class="btn btn-bonus" onclick="updateScore(${index}, ${gameState.bonusValue})">+${gameState.bonusValue} Bonus</button>
-                            <button class="btn btn-secondary" onclick="updateScore(${index}, -1)">-1</button>
-                        </div>
-                    </div>
-                `;
-                teamsGrid.appendChild(teamCard);
-            });
-        }
+function renderScoreboard() {
+    teamsGrid.innerHTML = '';
+    gameState.teams.forEach((team, index) => {
+        const teamCard = document.createElement('div');
+        teamCard.className = 'team-card';
+        teamCard.innerHTML = `
+            <h3>${team.name}</h3>
+            <div class="score-display" id="score-${index}">${gameState.runningTotals[index]}</div>
+            <div class="control-buttons">
+                <button class="btn btn-success btn-main" onclick="updateScore(${index}, 1)">+1</button>
+                <div class="secondary-buttons">
+                    <button class="btn btn-bonus" onclick="updateScore(${index}, ${gameState.bonusValue})">+${gameState.bonusValue} Bonus</button>
+                    <button class="btn btn-secondary" onclick="updateScore(${index}, -1)">-1</button>
+                </div>
+            </div>
+        `;
+        teamsGrid.appendChild(teamCard);
+    });
+}
     </script>
 </body>
 </html>
