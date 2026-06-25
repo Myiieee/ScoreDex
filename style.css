@@ -1,0 +1,180 @@
+/* Base Styles & Reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f2f5;
+    color: #333;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 800px;
+}
+
+/* Utilities */
+.hidden {
+    display: none !important;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: #ddd;
+    margin: 15px 0 25px 0;
+}
+
+/* Card Styling */
+.card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+h1, h2 {
+    text-align: center;
+    color: #1a1a1a;
+}
+
+/* Setup Form */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+    border-color: #4dabf7;
+}
+
+/* Header UI for Board */
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Button Foundations */
+.btn {
+    display: block;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+    transition: transform 0.1s, opacity 0.2s;
+    font-size: 16px;
+}
+
+.btn:active {
+    transform: scale(0.97);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: #3b5998;
+    color: white;
+}
+
+.btn-danger {
+    padding: 8px 16px;
+    background-color: #fa5252;
+    color: white;
+    font-size: 14px;
+}
+
+/* Responsive Grid System: Forced 2 Columns */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+/* Team Displays */
+.team-card {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.team-card h3 {
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 5px;
+}
+
+.score-display {
+    font-size: 42px;
+    font-weight: 800;
+    color: #212529;
+    margin: 10px 0;
+}
+
+/* Scoring Controls Matrix */
+.control-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* The giant primary +1 button */
+.btn-main {
+    width: 100%;
+    padding: 20px 0;
+    font-size: 24px;
+    background-color: #2b8a3e;
+    color: white;
+}
+
+/* Side-by-side secondary actions */
+.secondary-buttons {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 8px;
+}
+
+.btn-bonus {
+    padding: 10px 5px;
+    background-color: #e67e22;
+    color: white;
+    font-size: 13px;
+}
+
+.btn-secondary {
+    padding: 10px 5px;
+    background-color: #868e96;
+    color: white;
+    font-size: 13px;
+}

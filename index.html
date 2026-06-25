@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScoreFlex - Customizable Scoreboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <section id="setup-page" class="card">
+            <h1>ScoreFlex Setup</h1>
+            <hr>
+            <div class="form-group">
+                <label for="team-count">Number of Teams:</label>
+                <input type="number" id="team-count" min="1" max="12" value="2">
+            </div>
+
+            <div class="form-group">
+                <label for="bonus-value">Bonus Points Value:</label>
+                <input type="number" id="bonus-value" value="5">
+            </div>
+
+            <button id="start-btn" class="btn btn-primary">Start Game</button>
+        </section>
+
+        <section id="board-page" class="card hidden">
+            <div class="board-header">
+                <h2>Scoreboard</h2>
+                <button id="exit-btn" class="btn btn-danger">Exit Game</button>
+            </div>
+            <hr>
+            
+            <div id="teams-grid" class="grid-container">
+                </div>
+        </section>
+    </div>
+
+    <script>
+        // DOM Elements
+        const setupPage = document.getElementById('setup-page');
+        const boardPage = document.getElementById('board-page');
+        const startBtn = document.getElementById('start-btn');
+        const exitBtn = document.getElementById('exit-btn');
+        const teamCountInput = document.getElementById('team-count');
+        const bonusValueInput = document.getElementById('bonus-value');
+        const teamsGrid = document.getElementById('teams-grid');
+
+        let gameState = {
+            teams: [],
+            bonusValue: 5
+        };
+
+        // Event Listeners
+        startBtn.addEventListener('click', startGame);
+        exitBtn.addEventListener('click', exitGame);
+
+        // Functions
+        function startGame() {
+            const teamCount = parseInt(teamCountInput.value) || 2;
+            gameState.bonusValue = parseInt(bonusValueInput.value) || 5;
+            gameState.teams = [];
+
+            // Initialize teams data structure
+            for (let i = 1; i <= teamCount; i++) {
+                gameState.teams.push({
+                    id: i,
+                    name: `Team ${i}`,
+                    score: 0
+                });
+            }
+
+            renderScoreboard();
+            setupPage.classList.add('hidden');
+            boardPage.classList.remove('hidden');
+        }
+
+        function exitGame() {
+            if (confirm("Are you sure you want to exit? Game progress will be lost.")) {
+                boardPage.classList.add('hidden');
+                setupPage.classList.remove('hidden');
+                teamsGrid.innerHTML = '';
+            }
+        }
+
+        function updateScore(teamIndex, amount) {
+            gameState.teams[teamIndex].score += amount;
+            document.getElementById(`score-${teamIndex}`).textContent = gameState.teams[teamIndex].score;
+        }
+
+        function renderScoreboard() {
+            teamsGrid.innerHTML = '';
+
+            gameState.teams.forEach((team, index) => {
+                const teamCard = document.createElement('div');
+                teamCard.className = 'team-card';
+
+                teamCard.innerHTML = `
+                    <h3>${team.name}</h3>
+                    <div class="score-display" id="score-${index}">${team.score}</div>
+                    
+                    <div class="control-buttons">
+                        <button class="btn btn-success btn-main" onclick="updateScore(${index}, 1)">+1</button>
+                        <div class="secondary-buttons">
+                            <button class="btn btn-bonus" onclick="updateScore(${index}, ${gameState.bonusValue})">+${gameState.bonusValue} Bonus</button>
+                            <button class="btn btn-secondary" onclick="updateScore(${index}, -1)">-1</button>
+                        </div>
+                    </div>
+                `;
+                teamsGrid.appendChild(teamCard);
+            });
+        }
+    </script>
+</body>
+</html>
