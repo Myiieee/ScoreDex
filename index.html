@@ -22,6 +22,14 @@
                 <input type="number" id="bonus-value" value="5">
             </div>
 
+            <div class="form-group toggle-group">
+                <label for="allow-negative">Allow Negative Scores:</label>
+                <label class="switch">
+                    <input type="checkbox" id="allow-negative">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
             <button id="start-btn" class="btn btn-primary">Start Game</button>
         </section>
 
@@ -34,6 +42,17 @@
             
             <div id="teams-grid" class="grid-container">
                 </div>
+
+            <div class="round-control">
+                <button id="round-btn" class="btn btn-round">Log Round Winner</button>
+            </div>
+
+            <div class="log-container">
+                <h3>Activity & Round Log</h3>
+                <div id="log-box" class="log-box">
+                    <div class="log-entry system-msg">Game started. Ready to score!</div>
+                </div>
+            </div>
         </section>
     </div>
 
@@ -43,26 +62,34 @@
         const boardPage = document.getElementById('board-page');
         const startBtn = document.getElementById('start-btn');
         const exitBtn = document.getElementById('exit-btn');
+        const roundBtn = document.getElementById('round-btn');
         const teamCountInput = document.getElementById('team-count');
         const bonusValueInput = document.getElementById('bonus-value');
+        const allowNegativeInput = document.getElementById('allow-negative');
         const teamsGrid = document.getElementById('teams-grid');
+        const logBox = document.getElementById('log-box');
 
         let gameState = {
             teams: [],
-            bonusValue: 5
+            bonusValue: 5,
+            allowNegative: false,
+            currentRound: 1
         };
 
         // Event Listeners
         startBtn.addEventListener('click', startGame);
         exitBtn.addEventListener('click', exitGame);
+        roundBtn.addEventListener('click', logRoundWinner);
 
         // Functions
         function startGame() {
             const teamCount = parseInt(teamCountInput.value) || 2;
             gameState.bonusValue = parseInt(bonusValueInput.value) || 5;
+            gameState.allowNegative = allowNegativeInput.checked;
             gameState.teams = [];
+            gameState.currentRound = 1;
 
-            // Initialize teams data structure
+            // Initialize teams
             for (let i = 1; i <= teamCount; i++) {
                 gameState.teams.push({
                     id: i,
@@ -70,6 +97,9 @@
                     score: 0
                 });
             }
+
+            // Reset Log
+            logBox.innerHTML = '<div class="log-entry system-msg">Game started. Ready to score!</div>';
 
             renderScoreboard();
             setupPage.classList.add('hidden');
@@ -85,8 +115,64 @@
         }
 
         function updateScore(teamIndex, amount) {
-            gameState.teams[teamIndex].score += amount;
-            document.getElementById(`score-${teamIndex}`).textContent = gameState.teams[teamIndex].score;
+            const team = gameState.teams[teamIndex];
+            const oldScore = team.score;
+            const newScore = oldScore + amount;
+
+            // Boundary Check for Negative Scores
+            if (!gameState.allowNegative && newScore < 0) {
+                addLogEntry(`⚠️ Cannot reduce ${team.name} below 0!`, 'error-msg');
+                return; 
+            }
+
+            team.score = newScore;
+            document.getElementById(`score-${teamIndex}`).textContent = team.score;
+
+            // Log entry creation
+            const actionText = amount > 0 ? `added +${amount}` : `subtracted ${amount}`;
+            addLogEntry(`${team.name}: Score changed from ${oldScore} → ${team.score} (${actionText})`, 'score-msg');
+        }
+
+        function logRoundWinner() {
+            if (gameState.teams.length === 0) return;
+
+            // Determine highest score
+            let maxScore = -Infinity;
+            let winners = [];
+
+            gameState.teams.forEach(team => {
+                if (team.score > maxScore) {
+                    maxScore = team.score;
+                    winners = [team.name];
+                } else if (team.score === maxScore) {
+                    winners.push(team.name); // Handle ties
+                }
+            });
+
+            let resultText = "";
+            if (winners.length === gameState.teams.length && maxScore === 0) {
+                resultText = `🔄 Round ${gameState.currentRound} ended: No points scored yet (Tie).`;
+            } else if (winners.length > 1) {
+                resultText = `👑 Round ${gameState.currentRound} Tie Winner: ${winners.join(' & ')} with ${maxScore} pts!`;
+            } else {
+                resultText = `👑 Round ${gameState.currentRound} Winner: ${winners[0]} with ${maxScore} pts!`;
+            }
+
+            addLogEntry(resultText, 'round-msg');
+            gameState.currentRound++;
+            
+            // Optional auto-scroll behavior
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function addLogEntry(text, typeClass) {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${typeClass}`;
+            
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            entry.innerHTML = `<span class="log-time">[${time}]</span> ${text}`;
+            
+            logBox.insertBefore(entry, logBox.firstChild); // Pushes newest to the top
         }
 
         function renderScoreboard() {

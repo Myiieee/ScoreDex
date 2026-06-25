@@ -57,7 +57,7 @@ h1, h2 {
     font-weight: 600;
 }
 
-.form-group input {
+.form-group input[type="number"] {
     width: 100%;
     padding: 12px;
     border: 2px solid #ced4da;
@@ -69,6 +69,58 @@ h1, h2 {
 
 .form-group input:focus {
     border-color: #4dabf7;
+}
+
+/* Toggle Switch Styling */
+.toggle-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #3b5998;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
 }
 
 /* Header UI for Board */
@@ -112,7 +164,7 @@ h1, h2 {
 /* Responsive Grid System: Stacks into rows on mobile, 2-columns on desktop */
 .grid-container {
     display: grid;
-    grid-template-columns: 1fr; /* Default to 1 item per row (stacked rows) */
+    grid-template-columns: 1fr;
     gap: 15px;
 }
 
@@ -149,7 +201,6 @@ h1, h2 {
     gap: 10px;
 }
 
-/* The giant primary +1 button */
 .btn-main {
     width: 100%;
     padding: 18px 0;
@@ -158,7 +209,6 @@ h1, h2 {
     color: white;
 }
 
-/* Side-by-side secondary actions */
 .secondary-buttons {
     display: grid;
     grid-template-columns: 2fr 1fr;
@@ -179,9 +229,67 @@ h1, h2 {
     font-size: 14px;
 }
 
+/* Round Indicator Control */
+.round-control {
+    margin: 20px 0;
+}
+
+.btn-round {
+    width: 100%;
+    padding: 15px;
+    background-color: #1098ad;
+    color: white;
+    font-size: 18px;
+}
+
+/* Log Container System */
+.log-container {
+    margin-top: 20px;
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.log-container h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #495057;
+}
+
+.log-box {
+    max-height: 180px;
+    overflow-y: auto;
+    font-family: monospace;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 5px;
+}
+
+/* Log Theme Coloring */
+.log-entry {
+    padding: 6px 8px;
+    border-radius: 4px;
+    background: #fff;
+    border-left: 4px solid #ced4da;
+    line-height: 1.4;
+}
+
+.log-time {
+    color: #868e96;
+    font-weight: bold;
+}
+
+.system-msg { border-left-color: #3b5998; background: #edf2ff; }
+.score-msg { border-left-color: #2b8a3e; }
+.round-msg { border-left-color: #1098ad; font-weight: bold; background: #e3fafc; }
+.error-msg { border-left-color: #fa5252; color: #c92a2a; background: #fff5f5; }
+
 /* Media Query for Tablets and Desktops */
 @media (min-width: 600px) {
     .grid-container {
-        grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 columns on larger screens */
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
