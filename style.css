@@ -46,7 +46,13 @@ h1, h2 {
     color: #1a1a1a;
 }
 
-/* Setup Form */
+.winner-banner {
+    color: #2b8a3e;
+    margin-top: 10px;
+    font-size: 24px;
+}
+
+/* Setup Form Elements */
 .form-group {
     margin-bottom: 20px;
 }
@@ -71,7 +77,7 @@ h1, h2 {
     border-color: #4dabf7;
 }
 
-/* Toggle Switch Styling */
+/* Toggle Switch Interface */
 .toggle-group {
     display: flex;
     justify-content: space-between;
@@ -94,10 +100,7 @@ h1, h2 {
 .slider {
     position: absolute;
     cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    top: 0; left: 0; right: 0; bottom: 0;
     background-color: #ccc;
     transition: .4s;
     border-radius: 34px;
@@ -106,24 +109,17 @@ h1, h2 {
 .slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
-    left: 4px;
-    bottom: 4px;
+    height: 18px; width: 18px;
+    left: 4px; bottom: 4px;
     background-color: white;
     transition: .4s;
     border-radius: 50%;
 }
 
-input:checked + .slider {
-    background-color: #3b5998;
-}
+input:checked + .slider { background-color: #3b5998; }
+input:checked + .slider:before { transform: translateX(24px); }
 
-input:checked + .slider:before {
-    transform: translateX(24px);
-}
-
-/* Header UI for Board */
+/* Header UI Elements */
 .board-header {
     display: flex;
     justify-content: space-between;
@@ -131,7 +127,7 @@ input:checked + .slider:before {
     margin-bottom: 10px;
 }
 
-/* Button Foundations */
+/* Button UI Definitions */
 .btn {
     display: block;
     cursor: pointer;
@@ -143,32 +139,18 @@ input:checked + .slider:before {
     font-size: 16px;
 }
 
-.btn:active {
-    transform: scale(0.97);
-}
+.btn:active { transform: scale(0.97); }
+.btn-primary { width: 100%; padding: 14px; background-color: #3b5998; color: white; }
+.btn-danger { padding: 8px 16px; background-color: #fa5252; color: white; font-size: 14px; }
 
-.btn-primary {
-    width: 100%;
-    padding: 14px;
-    background-color: #3b5998;
-    color: white;
-}
-
-.btn-danger {
-    padding: 8px 16px;
-    background-color: #fa5252;
-    color: white;
-    font-size: 14px;
-}
-
-/* Responsive Grid System: Stacks into rows on mobile, 2-columns on desktop */
+/* Responsive Grid Layout: Stacks into rows on mobile devices */
 .grid-container {
     display: grid;
     grid-template-columns: 1fr;
     gap: 15px;
 }
 
-/* Team Displays */
+/* Team Box Design */
 .team-card {
     background: #f8f9fa;
     border: 2px solid #e9ecef;
@@ -194,100 +176,56 @@ input:checked + .slider:before {
     margin: 5px 0;
 }
 
-/* Scoring Controls Matrix */
+/* Scoring Configurations Matrix */
 .control-buttons {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.btn-main {
+.btn-main { width: 100%; padding: 18px 0; font-size: 26px; background-color: #2b8a3e; color: white; }
+.secondary-buttons { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; }
+.btn-bonus { padding: 12px 5px; background-color: #e67e22; color: white; font-size: 14px; }
+.btn-secondary { padding: 12px 5px; background-color: #868e96; color: white; font-size: 14px; }
+
+/* Mid-Game Advance Control Action */
+.action-control {
+    margin-top: 25px;
+}
+
+.btn-action {
     width: 100%;
-    padding: 18px 0;
-    font-size: 26px;
-    background-color: #2b8a3e;
-    color: white;
-}
-
-.secondary-buttons {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 10px;
-}
-
-.btn-bonus {
-    padding: 12px 5px;
-    background-color: #e67e22;
-    color: white;
-    font-size: 14px;
-}
-
-.btn-secondary {
-    padding: 12px 5px;
-    background-color: #868e96;
-    color: white;
-    font-size: 14px;
-}
-
-/* Round Indicator Control */
-.round-control {
-    margin: 20px 0;
-}
-
-.btn-round {
-    width: 100%;
-    padding: 15px;
+    padding: 16px;
     background-color: #1098ad;
     color: white;
     font-size: 18px;
 }
 
-/* Log Container System */
-.log-container {
-    margin-top: 20px;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 10px;
-    padding: 15px;
-}
-
-.log-container h3 {
+/* Structural Results Table Summary Styling */
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
     font-size: 16px;
-    margin-bottom: 10px;
-    color: #495057;
 }
 
-.log-box {
-    max-height: 180px;
-    overflow-y: auto;
-    font-family: monospace;
-    font-size: 13px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding-right: 5px;
+.results-table th, .results-table td {
+    border: 1px solid #dee2e6;
+    padding: 12px;
+    text-align: center;
 }
 
-/* Log Theme Coloring */
-.log-entry {
-    padding: 6px 8px;
-    border-radius: 4px;
-    background: #fff;
-    border-left: 4px solid #ced4da;
-    line-height: 1.4;
-}
-
-.log-time {
-    color: #868e96;
+.results-table th {
+    background-color: #f1f3f5;
     font-weight: bold;
 }
 
-.system-msg { border-left-color: #3b5998; background: #edf2ff; }
-.score-msg { border-left-color: #2b8a3e; }
-.round-msg { border-left-color: #1098ad; font-weight: bold; background: #e3fafc; }
-.error-msg { border-left-color: #fa5252; color: #c92a2a; background: #fff5f5; }
+.total-row {
+    background-color: #e8f5e9;
+    font-size: 18px;
+}
 
-/* Media Query for Tablets and Desktops */
+/* Screen Configuration Adaptations for Larger Displays */
 @media (min-width: 600px) {
     .grid-container {
         grid-template-columns: repeat(2, minmax(0, 1fr));
