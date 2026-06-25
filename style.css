@@ -9,7 +9,7 @@
 body {
     background-color: #f0f2f5;
     color: #333;
-    padding: 20px;
+    padding: 15px;
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -36,7 +36,7 @@ hr {
 /* Card Styling */
 .card {
     background: #ffffff;
-    padding: 25px;
+    padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
@@ -76,6 +76,7 @@ h1, h2 {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 10px;
 }
 
 /* Button Foundations */
@@ -108,10 +109,10 @@ h1, h2 {
     font-size: 14px;
 }
 
-/* Responsive Grid System: Forced 2 Columns */
+/* Responsive Grid System: Stacks into rows on mobile, 2-columns on desktop */
 .grid-container {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr; /* Default to 1 item per row (stacked rows) */
     gap: 15px;
 }
 
@@ -120,7 +121,7 @@ h1, h2 {
     background: #f8f9fa;
     border: 2px solid #e9ecef;
     border-radius: 10px;
-    padding: 15px;
+    padding: 20px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -128,18 +129,17 @@ h1, h2 {
 }
 
 .team-card h3 {
-    font-size: 18px;
+    font-size: 20px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 5px;
 }
 
 .score-display {
-    font-size: 42px;
+    font-size: 48px;
     font-weight: 800;
     color: #212529;
-    margin: 10px 0;
+    margin: 5px 0;
 }
 
 /* Scoring Controls Matrix */
@@ -152,8 +152,8 @@ h1, h2 {
 /* The giant primary +1 button */
 .btn-main {
     width: 100%;
-    padding: 20px 0;
-    font-size: 24px;
+    padding: 18px 0;
+    font-size: 26px;
     background-color: #2b8a3e;
     color: white;
 }
@@ -162,19 +162,26 @@ h1, h2 {
 .secondary-buttons {
     display: grid;
     grid-template-columns: 2fr 1fr;
-    gap: 8px;
+    gap: 10px;
 }
 
 .btn-bonus {
-    padding: 10px 5px;
+    padding: 12px 5px;
     background-color: #e67e22;
     color: white;
-    font-size: 13px;
+    font-size: 14px;
 }
 
 .btn-secondary {
-    padding: 10px 5px;
+    padding: 12px 5px;
     background-color: #868e96;
     color: white;
-    font-size: 13px;
+    font-size: 14px;
+}
+
+/* Media Query for Tablets and Desktops */
+@media (min-width: 600px) {
+    .grid-container {
+        grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 columns on larger screens */
+    }
 }
